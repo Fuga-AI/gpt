@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Music Theory Trainer</title>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(45deg,#1e1e30,#23234d);
+    color:#fff;
+    text-align:center;
+    margin:0;
+}
+
+h1{margin:20px 0;}
+
+#piano{
+    position:relative;
+    margin:20px auto;
+    height:200px;
+}
+
+.key{
+    position:absolute;
+    bottom:0;
+    cursor:pointer;
+    box-sizing:border-box;
+}
+
+.white{
+    width:40px;
+    height:200px;
+    background:white;
+    border:1px solid #000;
+    border-radius:0 0 5px 5px;
+}
+
+.black{
+    width:25px;
+    height:120px;
+    background:black;
+    border:1px solid #000;
+    border-radius:0 0 3px 3px;
+    z-index:2;
+}
+
+.key.active{background:#fdd835 !important;}
+
+button, select{
+    margin:5px;
+    padding:10px 15px;
+    font-size:16px;
+    border:none;
+    border-radius:4px;
+    background:#ff9800;
+    color:#fff;
+    cursor:pointer;
+}
+
+button:hover, select:hover{background:#ffa726;}
+
+.highlight{background:#4caf50 !important;}
+
+#message{margin-top:15px; min-height:20px;}
+</style>
+</head>
+<body>
+<h1>Music Theory Trainer</h1>
+<div id="piano"></div>
+<div id="controls">
+    <button id="playNote">Play Random Note</button>
+    <select id="scaleSelect">
+        <option value="">Choose a Scale</option>
+        <option value="C_major">C Major</option>
+        <option value="G_major">G Major</option>
+        <option value="A_minor">A Minor</option>
+    </select>
+    <select id="chordSelect">
+        <option value="">Choose a Chord</option>
+        <option value="C_major">C Major</option>
+        <option value="G_major">G Major</option>
+        <option value="A_minor">A Minor</option>
+    </select>
+</div>
+<div id="message"></div>
+
+<script>
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
+
+function midiToFreq(m){
+    return 440 * Math.pow(2, (m - 69) / 12);
+}
+function midiToNoteName(m){
+    const names=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+    return names[m%12] + (Math.floor(m/12)-1);
+}
+
+const notes=[];
+const noteMap={};
+for(let m=60;m<=84;m++){
+    const note=midiToNoteName(m);
+    const freq=midiToFreq(m);
+    notes.push({note,freq});
+    noteMap[note]=freq;
+}
+
+function createPiano(){
+    const piano=document.getElementById('piano');
+    const whiteWidth=40;
+    let whiteIndex=0;
+    notes.forEach((n,i)=>{
+        const key=document.createElement('div');
+        key.classList.add('key');
+        key.dataset.note=n.note;
+        key.dataset.freq=n.freq;
+        key.addEventListener('click',()=>handleKeyClick(key));
+        if(n.note.includes('#')){
+            key.classList.add('black');
+            key.style.left=(whiteIndex-1)*whiteWidth+28+"px";
+        }else{
+            key.classList.add('white');
+            key.style.left=whiteIndex*whiteWidth+"px";
+            whiteIndex++;
+        }
+        piano.appendChild(key);
+    });
+    piano.style.width=whiteIndex*whiteWidth+"px";
+}
+
+function playFreq(freq,duration=0.5){
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type='sine';
+    osc.frequency.value=freq;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    gain.gain.setValueAtTime(1,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+duration);
+    osc.stop(audioCtx.currentTime+duration);
+}
+
+function handleKeyClick(key){
+    const freq=parseFloat(key.dataset.freq);
+    const note=key.dataset.note;
+    playFreq(freq);
+    if(targetNote){
+        if(note===targetNote.note){
+            setMessage(`Correct! That was ${note}.`);
+            targetNote=null;
+        }else{
+            setMessage('Try again!');
+        }
+    }
+}
+
+let targetNote=null;
+function randomNote(){
+    return notes[Math.floor(Math.random()*notes.length)];
+}
+function setMessage(msg){
+    document.getElementById('message').textContent=msg;
+}
+
+document.getElementById('playNote').addEventListener('click',()=>{
+    targetNote=randomNote();
+    playFreq(targetNote.freq);
+    setMessage('Guess the note!');
+});
+
+function clearHighlights(){
+    document.querySelectorAll('.key').forEach(k=>k.classList.remove('highlight'));
+}
+function highlightNotes(arr){
+    arr.forEach(n=>{
+        const key=document.querySelector(`.key[data-note="${n}"]`);
+        if(key) key.classList.add('highlight');
+    });
+}
+
+function playSequence(arr){
+    arr.forEach((n,i)=>{
+        setTimeout(()=>playFreq(noteMap[n]), i*500);
+    });
+}
+
+const scales={
+    C_major:['C4','D4','E4','F4','G4','A4','B4','C5'],
+    G_major:['G4','A4','B4','C5','D5','E5','F#5','G5'],
+    A_minor:['A4','B4','C5','D5','E5','F5','G5','A5']
+};
+const chords={
+    C_major:['C4','E4','G4'],
+    G_major:['G4','B4','D5'],
+    A_minor:['A4','C5','E5']
+};
+
+document.getElementById('scaleSelect').addEventListener('change',e=>{
+    clearHighlights();
+    const val=e.target.value;
+    if(scales[val]){
+        highlightNotes(scales[val]);
+        playSequence(scales[val]);
+    }
+});
+
+document.getElementById('chordSelect').addEventListener('change',e=>{
+    clearHighlights();
+    const val=e.target.value;
+    if(chords[val]){
+        highlightNotes(chords[val]);
+        chords[val].forEach(n=>playFreq(noteMap[n]));
+    }
+});
+
+createPiano();
+</script>
+</body>
+</html>
