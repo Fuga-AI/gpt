@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>愛媛県観光ガイド</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    line-height: 1.6;
+    background: #fffaf0;
+    color: #333;
+  }
+  header {
+    background: #ff7f50;
+    color: white;
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+  nav {
+    background: #ffa07a;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  nav a:hover {
+    text-decoration: underline;
+  }
+  section {
+    padding: 2rem 1rem;
+    max-width: 900px;
+    margin: auto;
+  }
+  h2 {
+    color: #ff7f50;
+    border-bottom: 2px solid #ff7f50;
+    padding-bottom: 0.5rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  .card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+    cursor: pointer;
+    position: relative;
+  }
+  .card h3 {
+    margin-top: 0;
+  }
+  .details {
+    display: none;
+    margin-top: 0.5rem;
+  }
+  .card.active .details {
+    display: block;
+  }
+  footer {
+    text-align: center;
+    padding: 1rem;
+    background: #ffa07a;
+    color: white;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>愛媛県観光ガイド</h1>
+    <p>自然と歴史が調和する四国の旅へようこそ</p>
+  </header>
+  <nav>
+    <a href="#about">概要</a>
+    <a href="#attractions">観光スポット</a>
+    <a href="#food">グルメ</a>
+    <a href="#access">アクセス</a>
+  </nav>
+  <main>
+    <section id="about">
+      <h2>愛媛県について</h2>
+      <p>愛媛県は四国の北西部に位置し、温暖な気候と瀬戸内海の美しい景色が魅力です。日本最古の温泉とされる道後温泉や、歴史ある城下町が旅人を迎えます。</p>
+    </section>
+    <section id="attractions">
+      <h2>観光スポット</h2>
+      <div class="grid">
+        <div class="card" onclick="toggleDetails(this)">
+          <h3>松山城</h3>
+          <p>城下町を見渡す現存12天守の一つ。</p>
+          <div class="details">標高132mの勝山に建てられ、夜にはライトアップされます。</div>
+        </div>
+        <div class="card" onclick="toggleDetails(this)">
+          <h3>道後温泉</h3>
+          <p>日本最古の温泉地で湯巡りを満喫。</p>
+          <div class="details">明治時代に建てられた本館は国の重要文化財。</div>
+        </div>
+        <div class="card" onclick="toggleDetails(this)">
+          <h3>しまなみ海道</h3>
+          <p>島々を結ぶ絶景サイクリングロード。</p>
+          <div class="details">全長約70kmの自転車道は初心者から上級者まで楽しめます。</div>
+        </div>
+        <div class="card" onclick="toggleDetails(this)">
+          <h3>内子町</h3>
+          <p>江戸時代の町並みが残る風情ある町。</p>
+          <div class="details">八日市護国地区の町並みは重要伝統的建造物群保存地区に指定。</div>
+        </div>
+      </div>
+    </section>
+    <section id="food">
+      <h2>グルメ</h2>
+      <div class="grid">
+        <div class="card" onclick="toggleDetails(this)">
+          <h3>みかん</h3>
+          <p>日本一の柑橘王国。</p>
+          <div class="details">温暖な気候で育った甘いみかんを食べ比べてみましょう。</div>
+        </div>
+        <div class="card" onclick="toggleDetails(this)">
+          <h3>じゃこ天</h3>
+          <p>魚のすり身を揚げた郷土料理。</p>
+          <div class="details">宇和島の新鮮な魚を使用し、素朴な味わいが人気。</div>
+        </div>
+        <div class="card" onclick="toggleDetails(this)">
+          <h3>鯛めし</h3>
+          <p>炊き込み式と刺身を載せる宇和島式の二種類。</p>
+          <div class="details">観光地では両方のスタイルを楽しめるお店が多くあります。</div>
+        </div>
+      </div>
+    </section>
+    <section id="access">
+      <h2>アクセス</h2>
+      <p>松山空港へは東京や大阪からの直行便が運航。JR予讃線やフェリーも利用できます。しまなみ海道を通れば自動車や自転車で広島方面からの旅行も楽しめます。</p>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2024 愛媛県観光ガイド</p>
+  </footer>
+  <script>
+    function toggleDetails(card) {
+      card.classList.toggle('active');
+    }
+  </script>
+</body>
+</html>
